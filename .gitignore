@@ -1,0 +1,6 @@
+__pycache__/*
+.ipynb_chckpoints/*
+nn_models/__pycache__/*
+nn_models/.ipynb_checkpoints/*
+utils/__pycache__/*
+utils/.ipynb_checkpoints/*
