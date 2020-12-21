@@ -4,7 +4,7 @@ with open('./README.md', 'r') as f:
     long_description = f.read()
 
 setuptools.setup(name='nntools',
-                 version='0.1.6',
+                 version='0.1.7',
                  author='Riccardo Finotello',
                  author_email='riccardo.finotello@gmail.com',
                  description='Tools for deep learning and data analysis',

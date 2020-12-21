@@ -59,14 +59,12 @@ class PrintCheckpoint(keras.callbacks.Callback):
                 print(f'    {key} = {value:.6f}')
                 
 
-def model_checkpoints(outputs, root='.', validation=True, reduce_lr=None, lr_patience=150, min_lr=1.0e-6, summary=1, tensorboard=None):
+def model_checkpoints(outputs=None, root='.', validation=True, reduce_lr=None, lr_patience=150, min_lr=1.0e-6, summary=1, tensorboard=None):
     '''
     Create a list of checkpoints for each output.
     
-    Required arguments:
-        outputs: list of outputs to checkpoints.
-        
     Optional arguments:
+        outputs:     list of additional outputs to checkpoint,
         root:        root directory to save the models,
         validation:  whether to use validation losses (or training losses if False),
         reduce_lr:   learning rate reduction factor (if not None),
@@ -80,7 +78,10 @@ def model_checkpoints(outputs, root='.', validation=True, reduce_lr=None, lr_pat
     '''
         
     # add '_loss' to the outputs
-    outputs = ['loss'] + [output + '_loss' for output in outputs]
+    if outputs is not None:
+        outputs = ['loss'] + [output + '_loss' for output in outputs]
+    else:
+        outputs = ['loss']
     
     # if validation, then add 'val_' in fron of the list
     if validation:
