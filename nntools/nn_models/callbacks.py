@@ -5,13 +5,6 @@ Author(s)
 -----------
 
 Riccardo Finotello (riccardo.finotello@gmail.com)
-
-Version
------------
-v0.2.2 - add ability to create one hot encoded labels
-v0.2.1 - handle classification tasks
-v0.2.0 - add LeNet architecture to available models
-v0.1.0 - first release and public code
 '''
 
 from tensorflow import keras
