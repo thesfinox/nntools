@@ -529,7 +529,7 @@ def plot_metric(history,
             #palette = ['tab:blue']
         
         sns.lineplot(data=data,
-                     #palette=palette,
+                     palette='tab10',
                      ax=ax
                     )
 
