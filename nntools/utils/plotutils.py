@@ -523,13 +523,13 @@ def plot_metric(history,
     for m in metric:
         if validation:
             data    = hst[[m, 'val_' + m]]
-            #palette = ['tab:blue', 'tab:red']
+            palette = ['tab:blue', 'tab:red']
         else:
             data    = hst[m]
-            #palette = ['tab:blue']
+            palette = ['tab:blue']
         
         sns.lineplot(data=data,
-                     palette='tab10',
+                     palette=palette,
                      ax=ax
                     )
 
