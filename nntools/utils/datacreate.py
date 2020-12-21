@@ -47,7 +47,7 @@ def load_csv(path, **kwargs):
         the dataframe and the size of the dataset.
     '''
     
-    df             = pd.read_csv(data, **kwargs)
+    df             = pd.read_csv(path, **kwargs)
     n_rows, n_cols = df.shape
     
     print(f'Size of the dataset: {n_rows:d} rows, {n_cols:d} columns.')
@@ -69,7 +69,7 @@ def load_hdf(path, **kwargs):
         the dataframe and the size of the dataset.
     '''
     
-    df             = pd.read_hdf(data, **kwargs)
+    df             = pd.read_hdf(path, **kwargs)
     n_rows, n_cols = df.shape
     
     print(f'Size of the dataset: {n_rows:d} rows, {n_cols:d} columns.')
