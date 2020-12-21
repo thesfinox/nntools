@@ -8,6 +8,7 @@ Riccardo Finotello (riccardo.finotello@gmail.com)
 
 Version
 -----------
+v0.2.2 - add ability to create one hot encoded labels
 v0.2.1 - handle classification tasks
 v0.2.0 - add LeNet architecture to available models
 v0.1.0 - first release and public code
@@ -15,6 +16,7 @@ v0.1.0 - first release and public code
 
 import pandas as pd
 import numpy as np
+from tensorflow import keras
 
 def load_json(path, **kwargs):
     '''
@@ -175,17 +177,31 @@ def create_features(data, rescaling=None, reshape=None, name=None):
         return {name: np.array([np.array(data.iloc[n]).astype(np.float32) for n in range(data.shape[0])])}
     
 
-def create_labels(data, suff=None):
+def create_labels(data, one_hot=False, num_classes=None):
     '''
-    Create a dictionary of labels.
+    Create the training features (rescaled if necessary).
     
-    Required arguments:
-        data: the Pandas DataFrame with the data,
-        suff: suffix to add to the dictionary keys.
+    Needed arguments:
+        data: the Pandas DataFrame with the data.
+        
+    Optional arguments:
+        one_hot:     one hot encoding,
+        num_classes: number of classes.
     '''
     
-    if suff is not None:
-        return {name + '_' + suff: data[name].values.reshape(-1,).astype(np.int) for name in data.columns}
+    if one_hot:
+            
+        if num_classes is not None:
+            if not isinstance(num_classes, list):
+                num_classes = [num_classes] * data.shape[1]
+            
+            labels = {}
+            for n, name in enumerate(data.columns):
+                labels[name] = keras.utils.to_categorical(data[name].values.reshape(-1,).astype(np.int), num_classes=num_classes[n])
+                
+            return labels
+        
+        else:
+            return {name: keras.utils.to_categorical(data[name].values.reshape(-1,).astype(np.int)) for name in data.columns}
     else:
         return {name: data[name].values.reshape(-1,).astype(np.int) for name in data.columns}
-    
