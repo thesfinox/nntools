@@ -33,6 +33,50 @@ def load_json(path, **kwargs):
     return df, (n_rows, n_cols)
 
 
+def load_csv(path, **kwargs):
+    '''
+    Load CSV file and output stats.
+    
+    Required arguments:
+        path: the CSV file (path or remote URL).
+        
+    Optional arguments:
+        **kwargs: additional parameters to pass to pandas.read_hdf.
+        
+    Returns:
+        the dataframe and the size of the dataset.
+    '''
+    
+    df             = pd.read_csv(data, **kwargs)
+    n_rows, n_cols = df.shape
+    
+    print(f'Size of the dataset: {n_rows:d} rows, {n_cols:d} columns.')
+    
+    return df, (n_rows, n_cols)
+
+
+def load_hdf(path, **kwargs):
+    '''
+    Load HDF5 file and output stats.
+    
+    Required arguments:
+        path: the HDF5 file (path or remote URL).
+        
+    Optional arguments:
+        **kwargs: additional parameters to pass to pandas.read_hdf.
+        
+    Returns:
+        the dataframe and the size of the dataset.
+    '''
+    
+    df             = pd.read_hdf(data, **kwargs)
+    n_rows, n_cols = df.shape
+    
+    print(f'Size of the dataset: {n_rows:d} rows, {n_cols:d} columns.')
+    
+    return df, (n_rows, n_cols)
+
+
 def train_test(df, splits, random_state=None):
     '''
     Split the dataset into training, validation and test sets.
