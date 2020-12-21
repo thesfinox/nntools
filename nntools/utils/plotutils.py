@@ -349,6 +349,8 @@ def plot_loss(history,
               title='Loss Function',
               yscale=None,
               base_ratio=(1,1),
+              subplots=None,
+              return_ax=False,
               **kwargs
              ):
     '''
@@ -365,6 +367,8 @@ def plot_loss(history,
         title:      title of the plot,
         yscale:     y-axis scale,
         base_ratio: ratio of the output plot (tuple),
+        subplots:   pass a tuple of (figure, axis),
+        return_ax:  return the axis object if requested,
         **kwargs:   additional arguments to pass to savefig.
     '''
     
@@ -380,8 +384,11 @@ def plot_loss(history,
         palette = ['tab:blue']
     
     # plot the loss function
-    X, Y    = base_ratio
-    fig, ax = plt.subplots(1, 1, figsize=ratio(Y,X))
+    if subplots is not None:
+        fig, ax = subplots
+    else:
+        X, Y    = base_ratio
+        fig, ax = plt.subplots(1, 1, figsize=ratio(Y,X))
 
     sns.lineplot(data=data,
                  palette=palette,
@@ -400,6 +407,9 @@ def plot_loss(history,
     if out_name is not None:
         savefig(out_name, fig, root=root, **kwargs)
         
+    if return_ax:
+        return ax
+        
 
 def plot_lr(history,
             orient='index',
@@ -408,6 +418,8 @@ def plot_lr(history,
             title='Learning Rate',
             yscale='log',
             base_ratio=(1,1),
+            subplots=None,
+            return_ax=False,
             **kwargs
            ):
     '''
@@ -423,6 +435,8 @@ def plot_lr(history,
         title:      title of the plot,
         yscale:     y-axis scale,
         base_ratio: ratio of the output plot (tuple),
+        subplots:   pass a tuple of (figure, axis),
+        return_ax:  return the axis object if requested,
         **kwargs:   additional arguments to pass to savefig.
     '''
     
@@ -432,9 +446,12 @@ def plot_lr(history,
     data    = hst['lr']
     palette = ['tab:blue']
     
-    # plot the loss function
-    X, Y    = base_ratio
-    fig, ax = plt.subplots(1, 1, figsize=ratio(Y,X))
+    # plot the function
+    if subplots is not None:
+        fig, ax = subplots
+    else:
+        X, Y    = base_ratio
+        fig, ax = plt.subplots(1, 1, figsize=ratio(Y,X))
 
     sns.lineplot(data=data,
                  palette=palette,
@@ -450,6 +467,9 @@ def plot_lr(history,
     if out_name is not None:
         savefig(out_name, fig, root=root, **kwargs)
         
+    if return_ax:
+        return ax
+        
         
 def plot_metric(history,
                 metric='mean_squared_error',
@@ -461,6 +481,8 @@ def plot_metric(history,
                 ylabel='metric',
                 yscale=None,
                 base_ratio=(1,1),
+                subplots=None,
+                return_ax=False,
                 **kwargs
                ):
     '''
@@ -470,7 +492,7 @@ def plot_metric(history,
         history: location of the JSON file containing the history of the training.
     
     Optional arguments:
-        metric:     the name of the metric to plot,
+        metric:     the name of the metric to plot or list of metrics,
         orient:     orientation of the JSON file (for Pandas),
         out_name:   name of the ouput (without extension),
         root:       root of the save location,
@@ -478,6 +500,8 @@ def plot_metric(history,
         title:      title of the plot,
         yscale:     y-axis scale,
         base_ratio: ratio of the output plot (tuple),
+        subplots:   pass a tuple of (figure, axis),
+        return_ax:  return the axis object if requested,
         **kwargs:   additional arguments to pass to savefig.
     '''
     
@@ -485,21 +509,30 @@ def plot_metric(history,
     hst = pd.read_json(history, orient=orient)
         
     # select data
-    if validation:
-        data    = hst[[metric, 'val_' + metric]]
-        palette = ['tab:blue', 'tab:red']
-    else:
-        data    = hst[metric]
-        palette = ['tab:blue']
-    
-    # plot the loss function
-    X, Y    = base_ratio
-    fig, ax = plt.subplots(1, 1, figsize=ratio(Y,X))
+    if not isinstance(metric, list):
+        metric = [metric]
 
-    sns.lineplot(data=data,
-                 palette=palette,
-                 ax=ax
-                )
+    # plot the function
+    if subplots is not None:
+        fig, ax = subplots
+    else:
+        X, Y    = base_ratio
+        fig, ax = plt.subplots(1, 1, figsize=ratio(Y,X))
+
+    # plot the metrics
+    for m in metric:
+        if validation:
+            data    = hst[[m, 'val_' + m]]
+            palette = ['tab:blue', 'tab:red']
+        else:
+            data    = hst[m]
+            palette = ['tab:blue']
+        
+        sns.lineplot(data=data,
+                     palette=palette,
+                     ax=ax
+                    )
+
     ax.set(title=title,
            xlabel='epochs',
            ylabel=ylabel
@@ -512,3 +545,6 @@ def plot_metric(history,
 
     if out_name is not None:
         savefig(out_name, fig, root=root, **kwargs)
+        
+    if return_ax:
+        return ax
