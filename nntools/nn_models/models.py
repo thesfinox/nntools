@@ -52,7 +52,7 @@ def nn_inception(input_shape,
                  full_dropout=0.0,
                  batchnorm=0.99,
                  last_relu=True,
-                 loss_weights=[1.0],
+                 loss_weights=None,
                  l1_reg=0.0,
                  l2_reg=0.0,
                  auxiliary_fc=None,
@@ -132,10 +132,8 @@ def nn_inception(input_shape,
         output_size = [output_size]
     
     # assert that loss_weights and outputs are same length
-    if loss_weights is None:
-        loss_weights = [1.0]
-        
-    assert len(loss_weights) == len(output_names), 'Loss weights and outputs have different lengths!'
+    if isinstance(loss_weights, list):
+        assert len(loss_weights) == len(output_names), 'Loss weights and outputs have different lengths!'
     
     # input layer
     x = keras.layers.Input(shape=input_shape, name=name)
@@ -345,9 +343,9 @@ def nn_inception(input_shape,
         assert len(output_names) == len(output_size), 'Number of outputs does not match the list of output sizes.'
         
         # build the output layers
-        if last_relu:
+        if model_type == 'regression':
             O = {name: keras.layers.Dense(output_size[j],
-                                          activation='relu',
+                                          activation='relu' if last_relu else None,
                                           kernel_initializer=keras.initializers.GlorotUniform(random_state),
                                           bias_initializer=keras.initializers.Zeros(),
                                           name=name
@@ -355,6 +353,7 @@ def nn_inception(input_shape,
                 }
         else:
             O = {name: keras.layers.Dense(output_size[j],
+                                          activation='softmax' if output_size[j] > 1 else 'sigmoid',
                                           kernel_initializer=keras.initializers.GlorotUniform(random_state),
                                           bias_initializer=keras.initializers.Zeros(),
                                           name=name
@@ -388,9 +387,9 @@ def nn_inception(input_shape,
             # create the auxiliary outputs
             output_names_aux = [name + '_' + auxiliary_suff for name in output_names]
             
-            if last_relu:
+            if model_type == 'regression':
                 O_aux = {name: keras.layers.Dense(output_names_aux[j],
-                                                  activation='relu',
+                                                  activation='relu' if last_relu else None,
                                                   kernel_initializer=keras.initializers.GlorotUniform(random_state),
                                                   bias_initializer=keras.initializers.Zeros(),
                                                   name=name
@@ -398,6 +397,7 @@ def nn_inception(input_shape,
                         }
             else:
                 O_aux = {name: keras.layers.Dense(output_names_aux[j],
+                                                  activation='softmax' if output_names_aux[j] > 1 else 'sigmoid',
                                                   kernel_initializer=keras.initializers.GlorotUniform(random_state),
                                                   bias_initializer=keras.initializers.Zeros(),
                                                   name=name
@@ -405,13 +405,15 @@ def nn_inception(input_shape,
                         }
                 
         # create the loss weights
-        loss_weights = {name: loss_weights[n] for n, name in enumerate(output_names)}
+        if loss_weights is not None:
+            loss_weights = {name: loss_weights[n] for n, name in enumerate(output_names)}
         
         # compile the model
         if O_aux is not None:
             O.update(O_aux)
             model = keras.models.Model(inputs=I, outputs=O, name=name)
-            loss_weights.update({key + '_' + auxiliary_suff: value for key, value in loss_weights.items()})
+            if loss_weights is not None:
+                loss_weights.update({key + '_' + auxiliary_suff: value for key, value in loss_weights.items()})
         else:
             model = keras.models.Model(inputs=I, outputs=O, name=name)
             
@@ -461,7 +463,7 @@ def nn_lenet(input_shape,
              full_dropout=0.0,
              batchnorm=0.99,
              last_relu=True,
-             loss_weights=[1.0],
+             loss_weights=None,
              l1_reg=0.0,
              l2_reg=0.0,
              auxiliary_fc=None,
@@ -541,10 +543,8 @@ def nn_lenet(input_shape,
         output_size = [output_size]
     
     # assert that loss_weights and outputs are same length
-    if loss_weights is None:
-        loss_weights = [1.0]
-        
-    assert len(loss_weights) == len(output_names), 'Loss weights and outputs have different lengths!'
+    if isinstance(loss_weights, list):
+        assert len(loss_weights) == len(output_names), 'Loss weights and outputs have different lengths!'
     
     # convert kernels to correct format (int --> tuple --> list of tuples)
     if isinstance(conv_kernel, list):
@@ -671,9 +671,9 @@ def nn_lenet(input_shape,
         assert len(output_names) == len(output_size), 'Number of outputs does not match the list of output sizes.'
         
         # build the output layers
-        if last_relu:
+        if model_type == 'regression':
             O = {name: keras.layers.Dense(output_size[j],
-                                          activation='relu',
+                                          activation='relu' if last_relu else None,
                                           kernel_initializer=keras.initializers.GlorotUniform(random_state),
                                           bias_initializer=keras.initializers.Zeros(),
                                           name=name
@@ -681,6 +681,7 @@ def nn_lenet(input_shape,
                 }
         else:
             O = {name: keras.layers.Dense(output_size[j],
+                                          activation='softmax' if output_size[j] > 1 else 'sigmoid',
                                           kernel_initializer=keras.initializers.GlorotUniform(random_state),
                                           bias_initializer=keras.initializers.Zeros(),
                                           name=name
@@ -714,9 +715,9 @@ def nn_lenet(input_shape,
             # create the auxiliary outputs
             output_names_aux = [name + '_' + auxiliary_suff for name in output_names]
             
-            if last_relu:
+            if model_type == 'regression':
                 O_aux = {name: keras.layers.Dense(output_names_aux[j],
-                                                  activation='relu',
+                                                  activation='relu' if last_relu else None,
                                                   kernel_initializer=keras.initializers.GlorotUniform(random_state),
                                                   bias_initializer=keras.initializers.Zeros(),
                                                   name=name
@@ -724,6 +725,7 @@ def nn_lenet(input_shape,
                         }
             else:
                 O_aux = {name: keras.layers.Dense(output_names_aux[j],
+                                                  activation='softmax' if output_names_aux[j] > 1 else 'sigmoid',
                                                   kernel_initializer=keras.initializers.GlorotUniform(random_state),
                                                   bias_initializer=keras.initializers.Zeros(),
                                                   name=name
@@ -731,13 +733,15 @@ def nn_lenet(input_shape,
                         }
                 
         # create the loss weights
-        loss_weights = {name: loss_weights[n] for n, name in enumerate(output_names)}
+        if loss_weights is not None:
+            loss_weights = {name: loss_weights[n] for n, name in enumerate(output_names)}
         
         # compile the model
         if O_aux is not None:
             O.update(O_aux)
             model = keras.models.Model(inputs=I, outputs=O, name=name)
-            loss_weights.update({key + '_' + auxiliary_suff: value for key, value in loss_weights.items()})
+            if loss_weights is not None:
+                loss_weights.update({key + '_' + auxiliary_suff: value for key, value in loss_weights.items()})
         else:
             model = keras.models.Model(inputs=I, outputs=O, name=name)
             
@@ -779,7 +783,7 @@ def nn_dense(input_shape,
              dropout=0.2,
              batchnorm=0.99,
              last_relu=True,
-             loss_weights=[1.0],
+             loss_weights=None,
              l1_reg=0.0,
              l2_reg=0.0,
              auxiliary_fc=None,
@@ -851,7 +855,8 @@ def nn_dense(input_shape,
         output_size = [output_size]
     
     # assert that loss_weights and outputs are same length
-    assert len(loss_weights) == len(output_names), 'Loss weights and outputs have different lengths!'
+    if isinstance(loss_weights, list):
+        assert len(loss_weights) == len(output_names), 'Loss weights and outputs have different lengths!'
     
     # input layer
     x = keras.layers.Input(shape=input_shape, name=name)
@@ -889,9 +894,9 @@ def nn_dense(input_shape,
         # assert that list of sizes and list of outputs have the same length
         assert len(output_names) == len(output_size), 'Number of outputs does not match the list of output sizes.'
         
-        if last_relu:
+        if model_type == 'regression':
             O = {name: keras.layers.Dense(output_size[j],
-                                          activation='relu',
+                                          activation='relu' if last_relu else None,
                                           kernel_initializer=keras.initializers.GlorotUniform(random_state),
                                           bias_initializer=keras.initializers.Zeros(),
                                           name=name
@@ -899,6 +904,7 @@ def nn_dense(input_shape,
                 }
         else:
             O = {name: keras.layers.Dense(output_size[j],
+                                          activation='softmax' if output_size[j] > 1 else 'sigmoid',
                                           kernel_initializer=keras.initializers.GlorotUniform(random_state),
                                           bias_initializer=keras.initializers.Zeros(),
                                           name=name
@@ -932,9 +938,9 @@ def nn_dense(input_shape,
             # create the output layers
             output_names_aux = [name + '_' + auxiliary_suff for name in output_names]
             
-            if last_relu:
+            if model_type == 'regression':
                 O_aux = {name: keras.layers.Dense(output_size[j],
-                                                  activation='relu',
+                                                  activation='relu' if last_relu else None,
                                                   kernel_initializer=keras.initializers.GlorotUniform(random_state),
                                                   bias_initializer=keras.initializers.Zeros(),
                                                   name=name
@@ -942,6 +948,7 @@ def nn_dense(input_shape,
                         }
             else:
                 O_aux = {name: keras.layers.Dense(output_size[j],
+                                                  activation='softmax' if output_size[j] > 1 else 'sigmoid',
                                                   kernel_initializer=keras.initializers.GlorotUniform(random_state),
                                                   bias_initializer=keras.initializers.Zeros(),
                                                   name=name
@@ -949,12 +956,14 @@ def nn_dense(input_shape,
                         }
                 
         # create the loss weights
-        loss_weights = {name: loss_weights[n] for n, name in enumerate(output_names)}
+        if loss_weights is not None:
+            loss_weights = {name: loss_weights[n] for n, name in enumerate(output_names)}
         
         # compile the model
         if O_aux is not None:
             model = keras.models.Model(inputs=I, outputs=[O, O_aux], name=name)
-            loss_weights.update({key + '_' + auxiliary_suff: value for key, value in loss_weights.items()})
+            if loss_weights is not None:
+                loss_weights.update({key + '_' + auxiliary_suff: value for key, value in loss_weights.items()})
         else:
             model = keras.models.Model(inputs=I, outputs=O, name=name)
             
@@ -995,7 +1004,7 @@ def nn_full(models,
             batchnorm=0.99,
             dropout=0.1,
             last_relu=True,
-            loss_weights=[1.0],
+            loss_weights=None,
             l1_reg=0.0,
             l2_reg=0.0,
             random_state=None
@@ -1034,10 +1043,8 @@ def nn_full(models,
         output_size = [output_size]
     
     # assert that loss_weights and outputs are same length
-    if loss_weights is None:
-        loss_weights = [1.0]
-        
-    assert len(loss_weights) == len(output_names), 'Loss weights and outputs have different lengths!'
+    if isinstance(loss_weights, list):
+        assert len(loss_weights) == len(output_names), 'Loss weights and outputs have different lengths!'
     
     # build inputs
     I = {model.name: model.input[model.name] for model in models}
@@ -1062,22 +1069,22 @@ def nn_full(models,
     assert len(output_names) == len(output_size), 'Number of outputs does not match the list of output sizes.'
         
     # output layers
-    if last_relu:
-        if last_relu:
-            O = {name: keras.layers.Dense(output_size[j],
-                                          activation='relu',
-                                          kernel_initializer=keras.initializers.GlorotUniform(random_state),
-                                          bias_initializer=keras.initializers.Zeros(),
-                                          name=name
-                                         )(x) for j, name in enumerate(output_names)
-                }
-        else:
-            O = {name: keras.layers.Dense(output_size[j],
-                                          kernel_initializer=keras.initializers.GlorotUniform(random_state),
-                                          bias_initializer=keras.initializers.Zeros(),
-                                          name=name
-                                         )(x) for j, name in enumerate(output_names)
-                }
+    if model_type == 'regression':
+        O = {name: keras.layers.Dense(output_size[j],
+                                      activation='relu' if last_relu else None,
+                                      kernel_initializer=keras.initializers.GlorotUniform(random_state),
+                                      bias_initializer=keras.initializers.Zeros(),
+                                      name=name
+                                     )(x) for j, name in enumerate(output_names)
+            }
+    else:
+        O = {name: keras.layers.Dense(output_size[j],
+                                      activation='softmax' if output_size[j] > 1 else 'sigmoid',
+                                      kernel_initializer=keras.initializers.GlorotUniform(random_state),
+                                      bias_initializer=keras.initializers.Zeros(),
+                                      name=name
+                                     )(x) for j, name in enumerate(output_names)
+            }
     
     # build model
     model = keras.models.Model(inputs=I, outputs=O, name=name)
@@ -1149,10 +1156,8 @@ def add_fc(model_path,
     keras.backend.clear_session()
     
     # assert that loss_weights and outputs are same length
-    if loss_weights is None:
-        loss_weights = [1.0]
-        
-    assert len(loss_weights) == len(output_names), 'Loss weights and outputs have different lengths!'
+    if isinstance(loss_weights, list):
+        assert len(loss_weights) == len(output_names), 'Loss weights and outputs have different lengths!'
     
     # select input and output layers
     model_tmp = keras.models.load_model(model_path)
@@ -1184,22 +1189,21 @@ def add_fc(model_path,
     # assert that list of sizes and list of outputs have the same length
     assert len(output_names) == len(output_size), 'Number of outputs does not match the list of output sizes.'
         
-    if last_relu:
+    if model_type == 'regression':
         O = {name: keras.layers.Dense(output_size[j],
-                                      activation='relu',
+                                      activation='relu' if last_relu else None,
                                       kernel_initializer=keras.initializers.GlorotUniform(random_state),
                                       bias_initializer=keras.initializers.Zeros(),
                                       name=name
-                                     )(x)
-             for j, name in enumerate(output_names)
+                                     )(x) for j, name in enumerate(output_names)
             }
     else:
         O = {name: keras.layers.Dense(output_size[j],
+                                      activation='softmax' if output_size[j] > 1 else 'sigmoid',
                                       kernel_initializer=keras.initializers.GlorotUniform(random_state),
                                       bias_initializer=keras.initializers.Zeros(),
                                       name=name
-                                     )(x)
-             for j, name in enumerate(output_names)
+                                     )(x) for j, name in enumerate(output_names)
             }
     
     # build model
