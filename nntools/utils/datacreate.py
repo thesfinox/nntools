@@ -125,8 +125,8 @@ def train_test(df, splits, random_state=None):
         
         # compute the number of samples in each fold
         N      = df.shape[0]
-        n_test = N * splits['test']
-        n_val  = N * splits['val']
+        n_test = int(N * splits['test'])
+        n_val  = int(N * splits['val'])
             
         # sample the various folds
         df_test = df.sample(n=n_test, random_state=random_state)
@@ -137,14 +137,14 @@ def train_test(df, splits, random_state=None):
         
         # sample the training set
         if isinstance(splits['train'], list):
-            n_train = [N * value for value in splits['train']]
+            n_train = [int(N * value) for value in splits['train']]
             
             train = []
             for n in n_train:
                 train.append(df_oos.sample(n=n, random_state=random_state))
         else:
-            n_train = N * splits['train']
-            train   = df_oos.sample(n=n, random_state=random_state)
+            n_train = int(N * splits['train'])
+            train   = df_oos.sample(n=n_train, random_state=random_state)
             
         return (train, df_val, df_test), (n_train, n_val, n_test)
     
