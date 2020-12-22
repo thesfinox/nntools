@@ -31,6 +31,7 @@ def nn_inception(input_shape,
                  output_names=['out'],
                  output_size=[1],
                  model_type='regression',
+                 inception_kernel='vertical',
                  conv_1b1=False,
                  conv_layers=[32, 64, 32],
                  conv_alpha=0.0,
@@ -67,6 +68,7 @@ def nn_inception(input_shape,
         output_names:        list of names of the output,
         output_size:         list of output sizes (default to regression: size 1),
         model_type:          regression or classification,
+        inception_kernel:    either 'vertical' or a list of 2 tuples with a custom kernel,
         conv_1b1:            add 1x1 convolutions at the beginning (normalise the number of filters),
         conv_layers:         list of filters in convolutional layers,
         conv_alpha:          slope of the LeakyReLU activation of the convolutional layers,
@@ -127,6 +129,12 @@ def nn_inception(input_shape,
     # assert that loss_weights and outputs are same length
     if isinstance(loss_weights, list):
         assert len(loss_weights) == len(output_names), 'Loss weights and outputs have different lengths!'
+
+    # check inception kernel
+    if isinstance(inception_kernel, list):
+        assert len(inception_kernel) == 2, 'The inception kernel must be a list of 2 tuples!'
+        assert isinstance(inception_kernel[0], tuple), 'The first inception kernel is not a tuple!'
+        assert isinstance(inception_kernel[1], tuple), 'The second inception kernel is not a tuple!'
     
     # input layer
     x = keras.layers.Input(shape=input_shape, name=name)
@@ -151,7 +159,7 @@ def nn_inception(input_shape,
             a = keras.layers.LeakyReLU(conv_alpha, name=name + '_actA1b1a_' + str(n))(a)
             
         a = keras.layers.Conv2D(filters,
-                                kernel_size=(int(x.shape[1]), 1),
+                                kernel_size=(int(x.shape[1]), 1) if inception_kernel == 'vertical' else inception_kernel[0],
                                 padding='same',
                                 kernel_regularizer=keras.regularizers.l1_l2(l1=l1_reg, l2=l2_reg),
                                 kernel_initializer=keras.initializers.GlorotUniform(random_state),
@@ -174,7 +182,7 @@ def nn_inception(input_shape,
             b = keras.layers.LeakyReLU(conv_alpha, name=name+ '_actA1b1b_' + str(n))(b)
         
         b = keras.layers.Conv2D(filters,
-                                kernel_size=(1, int(x.shape[2])),
+                                kernel_size=(1, int(x.shape[2])) if inception_kernel == 'vertical' else inception_kernel[1],
                                 padding='same',
                                 kernel_regularizer=keras.regularizers.l1_l2(l1=l1_reg, l2=l2_reg),
                                 kernel_initializer=keras.initializers.GlorotUniform(random_state),
