@@ -64,7 +64,7 @@ def nn_inception(input_shape,
         
     Optional arguments:
         name:                the name of the model,
-        learning_rate:       the shrinking parameter of gradient descent,
+        learning_rate:       the shrinking parameter of gradient descent (None returns an uncopiled models),
         output_names:        list of names of the output,
         output_size:         list of output sizes (default to regression: size 1),
         model_type:          regression or classification,
@@ -412,26 +412,26 @@ def nn_inception(input_shape,
         # compile the model
         if O_aux is not None:
             O.update(O_aux)
-            model = keras.models.Model(inputs=I, outputs=O, name=name)
             if loss_weights is not None:
                 loss_weights.update({key + '_' + auxiliary_suff: value for key, value in loss_weights.items()})
-        else:
-            model = keras.models.Model(inputs=I, outputs=O, name=name)
+
+        model = keras.models.Model(inputs=I, outputs=O, name=name)
             
-        if model_type == 'regression':
-            model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
-                          loss=keras.losses.MeanSquaredError(),
-                          loss_weights=loss_weights,
-                          metrics=[keras.metrics.MeanSquaredError(),
-                                   keras.metrics.MeanAbsoluteError()
-                                  ]
-                         )
-        else:
-            model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
-                          loss=keras.losses.CategoricalCrossentropy(),
-                          loss_weights=loss_weights,
-                          metrics=[keras.metrics.CategoricalAccuracy()]
-                         )
+        if learning_rate is not None:
+            if model_type == 'regression':
+                model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+                              loss=keras.losses.MeanSquaredError(),
+                              loss_weights=loss_weights,
+                              metrics=[keras.metrics.MeanSquaredError(),
+                                       keras.metrics.MeanAbsoluteError()
+                                      ]
+                             )
+            else:
+                model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+                              loss=keras.losses.CategoricalCrossentropy(),
+                              loss_weights=loss_weights,
+                              metrics=[keras.metrics.CategoricalAccuracy()]
+                             )
     else:
         O = x
         
@@ -482,7 +482,7 @@ def nn_lenet(input_shape,
         
     Optional arguments:
         name:                the name of the model,
-        learning_rate:       the shrinking parameter of gradient descent,
+        learning_rate:       the shrinking parameter of gradient descent (None returns an uncopiled model),
         output_names:        list of names of the output,
         output_size:         list of output sizes (default to regression: size 1),
         model_type:          regression or classification,
@@ -740,26 +740,26 @@ def nn_lenet(input_shape,
         # compile the model
         if O_aux is not None:
             O.update(O_aux)
-            model = keras.models.Model(inputs=I, outputs=O, name=name)
             if loss_weights is not None:
                 loss_weights.update({key + '_' + auxiliary_suff: value for key, value in loss_weights.items()})
-        else:
-            model = keras.models.Model(inputs=I, outputs=O, name=name)
+
+        model = keras.models.Model(inputs=I, outputs=O, name=name)
             
-        if model_type == 'regression':
-            model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
-                          loss=keras.losses.MeanSquaredError(),
-                          loss_weights=loss_weights,
-                          metrics=[keras.metrics.MeanSquaredError(),
-                                   keras.metrics.MeanAbsoluteError()
-                                  ]
-                         )
-        else:
-            model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
-                          loss=keras.losses.CategoricalCrossentropy(),
-                          loss_weights=loss_weights,
-                          metrics=[keras.metrics.CategoricalAccuracy()]
-                         )
+        if learning_rate is not None:
+            if model_type == 'regression':
+                model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+                              loss=keras.losses.MeanSquaredError(),
+                              loss_weights=loss_weights,
+                              metrics=[keras.metrics.MeanSquaredError(),
+                                       keras.metrics.MeanAbsoluteError()
+                                      ]
+                             )
+            else:
+                model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+                              loss=keras.losses.CategoricalCrossentropy(),
+                              loss_weights=loss_weights,
+                              metrics=[keras.metrics.CategoricalAccuracy()]
+                             )
     else:
         O = x
         
@@ -802,7 +802,7 @@ def nn_dense(input_shape,
         
     Optional arguments:
         name:                the name of the model,
-        learning_rate:       the shrinking parameter of gradient descent,
+        learning_rate:       the shrinking parameter of gradient descent (None returns and uncompiled model),
         output_names:        list of names of the output,
         output_size:         list of output sizes (default to regression: size 1),
         model_type:          regression or classification,
@@ -962,26 +962,27 @@ def nn_dense(input_shape,
         
         # compile the model
         if O_aux is not None:
-            model = keras.models.Model(inputs=I, outputs=[O, O_aux], name=name)
+            O.update(O_aux)
             if loss_weights is not None:
                 loss_weights.update({key + '_' + auxiliary_suff: value for key, value in loss_weights.items()})
-        else:
-            model = keras.models.Model(inputs=I, outputs=O, name=name)
+
+        model = keras.models.Model(inputs=I, outputs=O, name=name)
             
-        if model_type == 'regression':
-            model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
-                          loss=keras.losses.MeanSquaredError(),
-                          loss_weights=loss_weights,
-                          metrics=[keras.metrics.MeanSquaredError(),
-                                   keras.metrics.MeanAbsoluteError()
-                                  ]
-                         )
-        else:
-            model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
-                          loss=keras.losses.CategoricalCrossentropy(),
-                          loss_weights=loss_weights,
-                          metrics=[keras.metrics.CategoricalAccuracy()]
-                         )
+        if learning_rate is not None:
+            if model_type == 'regression':
+                model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+                              loss=keras.losses.MeanSquaredError(),
+                              loss_weights=loss_weights,
+                              metrics=[keras.metrics.MeanSquaredError(),
+                                       keras.metrics.MeanAbsoluteError()
+                                      ]
+                             )
+            else:
+                model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+                              loss=keras.losses.CategoricalCrossentropy(),
+                              loss_weights=loss_weights,
+                              metrics=[keras.metrics.CategoricalAccuracy()]
+                             )
     else:
         O = x
         
@@ -1018,7 +1019,7 @@ def nn_full(models,
         
     Optional arguments:
         name:          the name of the full model,
-        learning_rate: the shrinking parameter of the model,
+        learning_rate: the shrinking parameter of the model (None returns an uncompiled model),
         output_names:  list of names of the output,
         output_size:   list of output sizes (default to regression: size 1),
         model_type:    regression or classification,
@@ -1090,20 +1091,21 @@ def nn_full(models,
     # build model
     model = keras.models.Model(inputs=I, outputs=O, name=name)
             
-    if model_type == 'regression':
-        model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
-                      loss=keras.losses.MeanSquaredError(),
-                      loss_weights=loss_weights,
-                      metrics=[keras.metrics.MeanSquaredError(),
-                               keras.metrics.MeanAbsoluteError()
-                              ]
-                     )
-    else:
-        model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
-                      loss=keras.losses.CategoricalCrossentropy(),
-                      loss_weights=loss_weights,
-                      metrics=[keras.metrics.CategoricalAccuracy()]
-                     )
+    if learning_rate is not None:
+        if model_type == 'regression':
+            model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+                          loss=keras.losses.MeanSquaredError(),
+                          loss_weights=loss_weights,
+                          metrics=[keras.metrics.MeanSquaredError(),
+                                   keras.metrics.MeanAbsoluteError()
+                                  ]
+                         )
+        else:
+            model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+                          loss=keras.losses.CategoricalCrossentropy(),
+                          loss_weights=loss_weights,
+                          metrics=[keras.metrics.CategoricalAccuracy()]
+                         )
     
     return model
 
@@ -1137,7 +1139,7 @@ def add_fc(model_path,
     Optional arguments:
         name:          the name of the full model,
         set_trainable: trainable attribute of the original model (bool),
-        learning_rate: the shrinking parameter of the model,
+        learning_rate: the shrinking parameter of the model (None returns an uncompiled model),
         output_names:  the list of names of the output,
         output_size:   list of output sizes (default to regression: size 1),
         model_type:    regression or classification,
@@ -1210,19 +1212,20 @@ def add_fc(model_path,
     # build model
     model = keras.models.Model(inputs=I, outputs=O, name=name)
             
-    if model_type == 'regression':
-        model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
-                      loss=keras.losses.MeanSquaredError(),
-                      loss_weights=loss_weights,
-                      metrics=[keras.metrics.MeanSquaredError(),
-                               keras.metrics.MeanAbsoluteError()
-                              ]
-                     )
-    else:
-        model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
-                      loss=keras.losses.CategoricalCrossentropy(),
-                      loss_weights=loss_weights,
-                      metrics=[keras.metrics.CategoricalAccuracy()]
-                     )
+    if learning_rate is not None:
+        if model_type == 'regression':
+            model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+                          loss=keras.losses.MeanSquaredError(),
+                          loss_weights=loss_weights,
+                          metrics=[keras.metrics.MeanSquaredError(),
+                                   keras.metrics.MeanAbsoluteError()
+                                  ]
+                         )
+        else:
+            model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+                          loss=keras.losses.CategoricalCrossentropy(),
+                          loss_weights=loss_weights,
+                          metrics=[keras.metrics.CategoricalAccuracy()]
+                         )
     
     return model
