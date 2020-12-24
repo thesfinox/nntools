@@ -1,3 +1,7 @@
+img/*
+venv/*
+*.pdf
+*.ipynb
 __pycache__/*
 .ipynb_chckpoints/*
 nntools/__pycache__/*
@@ -6,3 +10,5 @@ nntools/nn_models/__pycache__/*
 nntools/nn_models/.ipynb_checkpoints/*
 nntools/utils/__pycache__/*
 nntools/utils/.ipynb_checkpoints/*
+tests/__pycache__/*
+tests/.ipynb_checkpoints/*

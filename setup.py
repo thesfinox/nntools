@@ -4,7 +4,7 @@ with open('./README.md', 'r') as f:
     long_description = f.read()
 
 setuptools.setup(name='nntools',
-                 version='0.1.10',
+                 version='0.2.0',
                  author='Riccardo Finotello',
                  author_email='riccardo.finotello@gmail.com',
                  description='Tools for deep learning and data analysis',
@@ -21,8 +21,8 @@ setuptools.setup(name='nntools',
                  install_requires=['numpy',
                                    'pandas',
                                    'tensorflow>=2',
-                                   'seaborn',
+                                   'seaborn>=0.11',
                                    'matplotlib'
                                   ],
-                 python_requires='>=3.6'
+                 python_requires='>=3.6, <3.9'
                 ) 
