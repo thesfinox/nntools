@@ -25,7 +25,7 @@ def load_json(path, **kwargs):
         the dataframe and the size of the dataset.
     '''
     
-    df             = pd.read_json(data, **kwargs)
+    df             = pd.read_json(path, **kwargs)
     n_rows, n_cols = df.shape
     
     print(f'Size of the dataset: {n_rows:d} rows, {n_cols:d} columns.')
